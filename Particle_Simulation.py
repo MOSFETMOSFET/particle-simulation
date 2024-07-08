@@ -7,6 +7,7 @@ from PIL import Image, ImageDraw, ImageTk
 import random
 from collections import deque
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import pandas as pd
 
 matplotlib.use('TkAgg')
 
@@ -595,6 +596,15 @@ class ManualMode:
         return total_weighted_uncovered_area
 
     def plot_weighted_uncovered_area_vs_time(self):
+
+        data = {
+            "Time (s)": self.time_data,
+            "Weighted Uncovered Area": self.weighted_uncovered_area_data
+        }
+        df = pd.DataFrame(data)
+
+        df.to_excel("saved_data.xlsx", index=False)
+
         fig, ax = plt.subplots()
         ax.plot(self.time_data, self.weighted_uncovered_area_data, label="Weighted Uncovered Area")
         ax.set_xlabel("Time (s)")
