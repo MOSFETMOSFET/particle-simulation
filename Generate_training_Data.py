@@ -21,7 +21,7 @@ def generate_waveform_data(num_points):
             voltage = base_voltage
         voltages.append(voltage)
 
-    labels = [0] * num_points  # Label column with all values set to 0
+    labels = [0] * num_points
     return times, voltages, labels
 
 
@@ -43,14 +43,14 @@ def save_waveforms_to_excel(num_waveforms, min_points, max_points, filename):
 
 
 # Number of waveforms to generate
-num_waveforms = 10
+num_waveforms = 500
 
 # Minimum and maximum number of points in each waveform
 min_points = 10
 max_points = 20
 
 # Output filename
-filename = r'C:\Users\dell\Desktop\training_data\generated_data.xlsx'
+filename = r'C:\Users\dell\Desktop\training_data\training_data_1.xlsx'
 
 save_waveforms_to_excel(num_waveforms, min_points, max_points, filename)
 
