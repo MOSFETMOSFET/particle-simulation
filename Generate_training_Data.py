@@ -43,11 +43,11 @@ def save_waveforms_to_excel(num_waveforms, min_points, max_points, filename):
 
 
 # Number of waveforms to generate
-num_waveforms = 500
+num_waveforms = 5
 
 # Minimum and maximum number of points in each waveform
-min_points = 10
-max_points = 20
+min_points = 5
+max_points = 25
 
 # Output filename
 filename = r'C:\Users\dell\Desktop\training_data\training_data_1.xlsx'
