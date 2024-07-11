@@ -3,6 +3,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import StandardScaler
 import numpy as np
+from sklearn.model_selection import GridSearchCV
 
 def read_data(file_path):
     try:
@@ -10,12 +11,15 @@ def read_data(file_path):
         sheets = xls.sheet_names
         data = {sheet: xls.parse(sheet) for sheet in sheets}
         return data
+
     except FileNotFoundError:
         print(f"File not found: {file_path}")
         return None
+
     except ValueError as e:
         print(f"Value error reading {file_path}: {e}")
         return None
+
     except Exception as e:
         print(f"Error reading {file_path}: {e}")
         return None
@@ -31,8 +35,10 @@ def prepare_data(data):
     return X, y
 
 def pad_and_normalize_features(X, max_length):
+
     padded_X = []
     lengths = []
+
     for features in X:
         if len(features) < max_length:
             padded_features = np.pad(features, (0, max_length - len(features)), 'constant')
@@ -40,6 +46,7 @@ def pad_and_normalize_features(X, max_length):
             padded_features = features[:max_length]
         padded_X.append(padded_features)
         lengths.append(len(features))
+
     padded_X = np.array(padded_X)
 
     lengths = np.array(lengths).reshape(-1, 1)
@@ -51,11 +58,26 @@ def pad_and_normalize_features(X, max_length):
     return final_X, scaler
 
 def train_model(X, y):
+
     y = np.array(y)
     if not np.issubdtype(y.dtype, np.integer):
         raise ValueError("Labels are not discrete classes. Please provide discrete class labels.")
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    # # Parameter grid for GridSearchCV
+    # param_grid = {
+    #     'n_estimators': [100, 200, 300],
+    #     'max_depth': [10, 20, 30],
+    #     'min_samples_split': [2, 5, 10],
+    #     'min_samples_leaf': [1, 2, 4],
+    #     'max_features': ['sqrt', 'log2']
+    # }
+    #
+    # model = RandomForestClassifier(random_state=42)
+    # grid_search = GridSearchCV(estimator=model, param_grid=param_grid, cv=3, n_jobs=-1, verbose=2)
+    # grid_search.fit(X_train, y_train)
+
     model = RandomForestClassifier()
     model.fit(X_train, y_train)
     print(f"Model accuracy: {model.score(X_test, y_test)}")
