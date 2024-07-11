@@ -46,9 +46,10 @@ def main():
     t = np.linspace(0, 6, 1000)
 
     # Number of waveforms to generate
-    num_waveforms = 500
+    num_waveforms = 10
 
-    excel_filename = r'C:\Users\dell\Desktop\training_data\training_data_2.xlsx'
+    excel_filename = r'C:\Users\dell\Desktop\training_data\test_data.xlsx'
+    #excel_filename = r'C:\Users\dell\Desktop\training_data\training_data_2.xlsx'
 
     save_waveforms_to_excel(t, num_waveforms, excel_filename)
 
