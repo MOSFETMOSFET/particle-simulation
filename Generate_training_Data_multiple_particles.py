@@ -1,57 +1,59 @@
-import openpyxl
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib
 
-def load_waveform_from_sheet(ws):
-    times = []
-    voltages = []
-    for row in ws.iter_rows(min_row=2, values_only=True):  # Skip the header
-        time, voltage, _ = row
-        times.append(time)
-        voltages.append(voltage)
-    return times, voltages
+matplotlib.use('TkAgg')
 
-def save_waveform_to_sheet(ws, times, voltages):
-    ws.append(["Time", "Voltage", "Label"])
-    for time, voltage in zip(times, voltages):
-        ws.append([time, voltage, 0])
 
-def average_waveforms(waveform1, waveform2):
-    length = min(len(waveform1[0]), len(waveform2[0]))  # Use the length of the shorter waveform
-    averaged_times = []
-    averaged_voltages = []
-    for i in range(length):
-        avg_time = (waveform1[0][i] + waveform2[0][i]) / 2
-        avg_voltage = (waveform1[1][i] + waveform2[1][i]) / 2
-        averaged_times.append(avg_time)
-        averaged_voltages.append(avg_voltage)
-    return averaged_times, averaged_voltages
+def generate_waveform(t):
+    """
+    Generates a waveform with two local minima and highest values at the edges, with random variation.
+    """
+    # Create a base waveform with two dips
+    center1 = 2 + np.random.uniform(-0.5, 0.5)
+    center2 = 4 + np.random.uniform(-0.5, 0.5)
+    dip_width1 = 0.5 + np.random.uniform(-0.2, 0.2)
+    dip_width2 = 0.5 + np.random.uniform(-0.2, 0.2)
+    amplitude1 = 1.75e8 + np.random.uniform(-0.25e8, 0.25e8)
+    amplitude2 = 1.75e8 + np.random.uniform(-0.25e8, 0.25e8)
 
-def combine_waveforms(input_filename, output_filename):
-    wb_input = openpyxl.load_workbook(input_filename)
-    wb_output = openpyxl.Workbook()
+    waveform = 2.75e8 - amplitude1 * np.exp(-((t - center1) ** 2) / (2 * dip_width1 ** 2)) - amplitude2 * np.exp(
+        -((t - center2) ** 2) / (2 * dip_width2 ** 2))
 
-    sheetnames = wb_input.sheetnames
+    # Add some random noise
+    noise = np.random.normal(0, 0.05e8, t.shape)
+    waveform += noise
 
-    for i in range(len(sheetnames) - 1):
-        ws1 = wb_input[sheetnames[i]]
-        ws2 = wb_input[sheetnames[i + 1]]
+    return waveform
 
-        waveform1 = load_waveform_from_sheet(ws1)
-        waveform2 = load_waveform_from_sheet(ws2)
 
-        averaged_waveform = average_waveforms(waveform1, waveform2)
+def plot_waveform(t, waveform, filename):
+    """
+    Plots the waveform and saves it to a file.
+    """
+    plt.figure()
+    plt.plot(t, waveform, label="Weighted Uncovered Area")
+    plt.xlabel("Time (s)")
+    plt.ylabel("Weighted Uncovered Area")
+    plt.title("Weighted Uncovered Area vs. Time")
+    plt.legend()
+    plt.savefig(filename)
+    plt.close()
 
-        ws_output = wb_output.create_sheet(title=f'Combined_{i + 1}')
-        save_waveform_to_sheet(ws_output, *averaged_waveform)
 
-    # Remove the default sheet if exists
-    if 'Sheet' in wb_output.sheetnames:
-        del wb_output['Sheet']
+def main():
+    # Time array
+    t = np.linspace(0, 6, 1000)
 
-    wb_output.save(output_filename)
+    # Number of waveforms to generate
+    num_waveforms = 3
 
-input_filename = r'C:\Users\dell\Desktop\training_data\training_data_1.xlsx'
-output_filename = r'C:\Users\dell\Desktop\training_data\training_data_2.xlsx'
+    for i in range(num_waveforms):
+        waveform = generate_waveform(t)
+        filename = f"waveform_{i + 1}.png"
+        plot_waveform(t, waveform, filename)
+        print(f"Saved {filename}")
 
-combine_waveforms(input_filename, output_filename)
 
-print(f'Combined waveforms saved to {output_filename}')
+if __name__ == "__main__":
+    main()
